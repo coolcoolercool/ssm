@@ -16,7 +16,7 @@
 <!-- 如果Controller中接收的是Vo,那么页面上input框的name属性值要等于vo的属性.属性.属性..... -->
 <td>商品名称:<input type="text" name="items.name"/></td>
 <td>商品价格:<input type="text" name="items.price"/></td>
-<td><input type="submit" value="查询"/></td>
+<td><input type="submit" value="批量删除"/></td>
 </tr>
 </table>
 商品列表：
@@ -28,13 +28,22 @@
 	<td>商品描述</td>
 	<td>操作</td>
 </tr>
-<c:forEach items="${itemList }" var="item">
+<c:forEach items="${itemList }" var="item" varStatus="status">
 <tr>
-	<td>${item.name }</td>
-	<td>${item.price }</td>
-	<td><fmt:formatDate value="${item.createtime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
-	<td>${item.detail }</td>
-	
+	<%--name属性名称要等与vo中的接受的属性名--%>
+	<%--如果批量删除，可以用List<pojo>来接受,页面上input框的name属性值= vo中接受的集合属性名称+[list的下标]
+	+.+list泛型的属性名称  --%>
+	<td>
+		<input type="checkbox" name="ids" value="${item.id}"/>
+		<input type="hidden" name="itemsList[${status.index }].id" value="${item.id }"/>
+	</td>
+
+	<td><input type="text" name="itemsList[${status.index }].name" value="${item.name }"/></td>
+	<td><input type="text" name="itemsList[${status.index }].price" value="${item.price }"/></td>
+	<td><input type="text" name="itemsList[${status.index }].createtime"
+			   value="<fmt:formatDate value="${item.createtime}" pattern="yyyy-MM-dd HH:mm:ss"/>"/></td>
+	<td><input type="text" name="itemsList[${status.index }].detail" value="${item.detail }"/></td>
+
 	<td><a href="${pageContext.request.contextPath }/itemEdit.action?id=${item.id}">修改</a></td>
 
 </tr>

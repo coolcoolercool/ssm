@@ -19,11 +19,18 @@ import java.util.List;
  */
 
 @Controller
+/*窄化请求映射:为了防止你和你的队友在controller方法起名的时候重名,所以相当于在url中多加了
+* 一层目录,为了防止重名  例如:当前list的访问路径 localhost:8080/ssm/items/list.action
+* 字符串前面分割符最好加上
+* */
+
+@RequestMapping("/items")
 public class ItemsController {
 
     @Autowired
     private ItemsService itemsService;
 
+    /*@RequestMapping(value="/list", method=RequestMethod.GET)*/
     @RequestMapping("/list")
     public ModelAndView itemList() throws Exception{
         List<Items> list = itemsService.list();
@@ -69,9 +76,9 @@ public class ItemsController {
     //public String update(Integer id, String name,
     // Float price, String detail) throws Exception{
     //springMvc可以直接接收pojo类型，要求页面上input框的name属性名称必须等于属性名称
-    /*@RequestMapping("updateitem")
+    @RequestMapping("updateitem")
     public String update(Integer id, String name,Float price, String detail) throws Exception{
-        *//*itemsService.updateItems(items);*//*
+
         Items items = new Items();
         items.setId(id);
         items.setName(name);
@@ -82,14 +89,14 @@ public class ItemsController {
         itemsService.updateItems(items);
 
         return "success";
-    }*/
+    }
 
-    @RequestMapping("updateitem")
+    /*@RequestMapping("updateitem")
     public String update(Items items) throws Exception{
         itemsService.updateItems(items);
 
         return "success";
-    }
+    }*/
 
 
     //如果controller中接收的是Vo，那么页面上的input框的nam属性值等于vo的属性，属性
@@ -99,6 +106,20 @@ public class ItemsController {
         return "";
     }
 
+    @RequestMapping("/delAll")
+    public String delAll(QueryVo vo) throws Exception{
+        //如果是批量删除，一堆复选框，那么可以提交数组。(只有input复选框被选中的时候才能提交)
+        System.out.println(vo);
+
+        return "";
+    }
+
+    @RequestMapping("/updateAll")
+    public String updateAll(QueryVo vo) throws Exception{
+        System.out.println(vo);
+
+        return "";
+    }
 
 
 }
