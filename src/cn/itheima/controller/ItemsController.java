@@ -23,7 +23,6 @@ import java.util.List;
 * 一层目录,为了防止重名  例如:当前list的访问路径 localhost:8080/ssm/items/list.action
 * 字符串前面分割符最好加上
 * */
-
 @RequestMapping("/items")
 public class ItemsController {
 
