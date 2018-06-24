@@ -6,12 +6,18 @@ import cn.itheima.vo.QueryVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * author: zzw5005
@@ -50,13 +56,17 @@ public class ItemsController {
     * HttpServletResponse
     * HttpSession
     * Model
+    *
+    * 通过@PathVariable可以接收url中传入的参数
+    * @RequestMapping("/itemEdit/{id}")中接收参数使用大括号加上变量名称，
+    * @PathVariable中的变量名称要和RequestMapping中变量名称相同
     * */
-    @RequestMapping("/itemEdit")
-    public String itemEdit(HttpServletRequest request,
+    @RequestMapping("/itemEdit/{id}")
+    public String itemEdit(@PathVariable("id") Integer id, HttpServletRequest request,
                            Model model) throws Exception{
-        String idStr = request.getParameter("id");
+        //String idStr = request.getParameter("id");
         //这里对idStr进行了类型转换
-        Items items = itemsService.findItemsById(Integer.parseInt(idStr));
+        Items items = itemsService.findItemsById(id);
 
 
         //Model模型:模型中放入了返回给页面的数据
@@ -75,7 +85,8 @@ public class ItemsController {
     //public String update(Integer id, String name,
     // Float price, String detail) throws Exception{
     //springMvc可以直接接收pojo类型，要求页面上input框的name属性名称必须等于属性名称
-    @RequestMapping("updateitem")
+
+    /*@RequestMapping("updateitem")
     public String update(Integer id, String name,Float price, String detail) throws Exception{
 
         Items items = new Items();
@@ -88,6 +99,37 @@ public class ItemsController {
         itemsService.updateItems(items);
 
         return "success";
+    }*/
+
+    /*@RequestMapping("updateitem")
+    public String update(Items items, Model model) throws Exception{
+        itemsService.updateItems(items);
+
+        model.addAttribute("id",items.getId());
+        //springMvc中请求转发:返回的字符串以forward:开头的都是请求转发
+        //后面forward:itemEdit.action表示相对路径，相对路径就是相对于当前的目录，
+        //当前为类上面指定的items目录。
+        //在当前目录下可以使用相对路径随意跳转到某个方法中，后面forward:/itemEdit.action路径中以
+        //斜杠开头的为绝对路径，绝对路径从项目名后面开始算
+        return "forward:/items/itemEdit.action";
+    }*/
+
+    @RequestMapping("updateitem")
+    public String update(MultipartFile pictureFile, Items items,Model model,
+     HttpServletRequest request) throws Exception{
+        //1.获取图片完整名称
+        String fileStr = pictureFile.getOriginalFilename();
+        //2.使用随机生成的字符串+源图片扩展名组成新的图片名称，防止图片重名
+        String newfileName = UUID.randomUUID().toString() +
+                fileStr.substring(fileStr.lastIndexOf("."));
+        //3.将图片保存到硬盘
+        pictureFile.transferTo(new File("F:\\javacode\\test\\" + newfileName));
+        //4.将图片名称保存到数据库
+        items.setPic(newfileName);
+        itemsService.updateItems(items);
+
+        return "redirect:itemEdit/"+items.getId();
+        /* return "success";*/
     }
 
     /*@RequestMapping("updateitem")
@@ -118,6 +160,18 @@ public class ItemsController {
         System.out.println(vo);
 
         return "";
+    }
+
+    //导入jackson的jar包 在controller的方法中可以使用@requestBody，让springMvc将json
+    //格式字符串自动转换java中的pojo
+    //页面json的key要等与java中pojo的属性名称
+    //controller方法返回pojo类型的对象并且用@RequestBody注解，
+    //springMvc会自动将pojo对象转换成json格式字符串
+    @RequestMapping("sendJson/")
+    @ResponseBody
+    public Items json(@RequestBody Items items) throws Exception{
+        System.out.println(items);
+        return items;
     }
 
 

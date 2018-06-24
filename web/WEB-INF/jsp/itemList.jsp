@@ -6,9 +6,26 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="${pageContext.request.contextPath }/js/jquery-1.4.4.min.js"></script>
 <title>查询商品列表</title>
 </head>
-<body> 
+<body>
+<script type="text/javascript">
+    function sendJson(){
+        //请求json响应json
+        $.ajax({
+            type:"post",
+            url:"${pageContext.request.contextPath }/items/sendJson.action",
+            contentType:"application/json;charset=utf-8",
+            data:'{"name":"测试商品","price":99.9}',
+            success:function(data){
+                alter(data);
+            }
+        });
+    }
+</script>
+<inout type="button" value="sendJson" onClick="sendJson()"/>
+
 <form action="${pageContext.request.contextPath }/search.action" method="post">
 查询条件：
 <table width="100%" border=1>
@@ -44,7 +61,7 @@
 			   value="<fmt:formatDate value="${item.createtime}" pattern="yyyy-MM-dd HH:mm:ss"/>"/></td>
 	<td><input type="text" name="itemsList[${status.index }].detail" value="${item.detail }"/></td>
 
-	<td><a href="${pageContext.request.contextPath }/itemEdit.action?id=${item.id}">修改</a></td>
+	<td><a href="${pageContext.request.contextPath }/items/itemEdit/${item.id}">修改</a></td>
 
 </tr>
 </c:forEach>
